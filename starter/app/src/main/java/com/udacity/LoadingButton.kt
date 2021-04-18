@@ -2,31 +2,197 @@ package com.udacity
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.Canvas
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.ContextCompat.getColor
 import kotlin.properties.Delegates
+
 
 class LoadingButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
     private var widthSize = 0
     private var heightSize = 0
+    private var initialLeftPositionX = 0f
+    private var initialLeftPositionY = 0f
+    private var leftPositionX = 0f
+    private var leftPositionY = 0f
+    private var rightPositionX = 0f
+    private var rightPositionY = 0f
+    private var state = false
+    private var showText = false
+    private var loading = false
 
     private val valueAnimator = ValueAnimator()
 
     private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
-
+        if (old != new) {
+            valueAnimator.start()
+        }
     }
+    private val intialText = context.getString(R.string.button_initial_text)
+    private val infoButtonText = context.getString(R.string.button_info_text)
+    private val loadingText = context.getString(R.string.button_loading_text)
+    private lateinit var extraCanvas: Canvas
+    private lateinit var extraBitmap: Bitmap
+
+
+    val textPaint = Paint().apply {
+        style = Paint.Style.FILL
+        textAlign = Paint.Align.CENTER
+        textSize = 30.0f
+        color = getColor(context, R.color.design_default_color_primary)
+        typeface = Typeface.create("", Typeface.BOLD)
+    }
+    val infoPaint = Paint().apply {
+        style = Paint.Style.FILL
+        textAlign = Paint.Align.CENTER
+        textSize = 30.0f
+        alpha = 0
+        color = getColor(context, R.color.white_transparent)
+        typeface = Typeface.create("", Typeface.BOLD)
+    }
+
+    val infoPaintText = Paint().apply {
+        style = Paint.Style.FILL
+        textAlign = Paint.Align.CENTER
+        textSize = 25.0f
+        alpha = 0
+        color = getColor(context, R.color.colorPrimaryDark)
+        typeface = Typeface.create("", Typeface.NORMAL)
+    }
+
+    val overlayPaint = Paint().apply {
+        style = Paint.Style.FILL
+        isDither = true
+        isAntiAlias = true
+        textAlign = Paint.Align.CENTER
+        textSize = 30.0f
+        color = getColor(context, R.color.colorPrimaryDark)
+        typeface = Typeface.create("", Typeface.BOLD)
+    }
+
+    val loadingPaint = Paint().apply {
+        style = Paint.Style.FILL
+        textAlign = Paint.Align.CENTER
+        textSize = 30.0f
+        alpha = 0
+        color = getColor(context, R.color.colorAccent)
+        typeface = Typeface.create("", Typeface.BOLD)
+    }
+
+    val loadingPaintText = Paint().apply {
+        style = Paint.Style.FILL
+        textAlign = Paint.Align.CENTER
+        textSize = 25.0f
+        alpha = 0
+        color = getColor(context, R.color.white)
+        typeface = Typeface.create("", Typeface.NORMAL)
+    }
+
+    var startAngle = 0f
+    var nextAngle = 0f
+    private var rectF = RectF(
+        (widthSize * 3 / 4).toFloat(),
+        (heightSize / 8).toFloat(),
+        (widthSize * 3 / 4).toFloat() + 20f,
+        (heightSize / 8).toFloat() + 20f
+    )
 
 
     init {
+        isClickable = true
+        setBackgroundColor(getColor(context, R.color.colorPrimary))
 
     }
 
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun performClick(): Boolean {
+        if (super.performClick()) return true
+        contentDescription = resources.getString(R.string.button_name)
+        state = false
+        loading = true
+        startAnimation()
+        invalidate()
+        return true
+    }
+
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
+        if (!state) {
+            canvas.drawText(
+                intialText,
+                (widthSize / 2).toFloat(),
+                (heightSize / 2).toFloat(),
+                textPaint
+            )
+        }
+
+        if (state) {
+
+            initialLeftPositionX
+            initialLeftPositionY = heightSize.toFloat()
+            rightPositionX += 10
+            rightPositionY += 10 - heightSize
+            canvas.drawRect(
+                initialLeftPositionX,
+                initialLeftPositionY,
+                rightPositionX,
+                rightPositionY,
+                overlayPaint
+            )
+            if (showText) {
+                canvas.drawRoundRect(
+                    (widthSize / 6).toFloat(),
+                    (heightSize / 8).toFloat(),
+                    (widthSize * 5 / 6).toFloat(),
+                    (heightSize * 7 / 8).toFloat(),
+                    40f,
+                    40f,
+                    infoPaint
+                )
+                canvas.drawText(
+                    infoButtonText,
+                    (widthSize / 2).toFloat(),
+                    (heightSize / 2).toFloat(),
+                    infoPaintText
+                )
+
+            }
+        }
+
+        if (loading) {
+            initialLeftPositionX
+            initialLeftPositionY = heightSize.toFloat()
+            rightPositionX += 10
+            rightPositionY += 10 - heightSize
+            canvas.drawRect(
+                initialLeftPositionX,
+                initialLeftPositionY,
+                rightPositionX,
+                rightPositionY,
+                overlayPaint
+            )
+
+            canvas.drawText(
+                loadingText,
+                (widthSize / 2).toFloat(),
+                (heightSize / 2).toFloat(),
+                infoPaint
+            )
+            nextAngle += 10f
+
+            canvas.drawArc(
+                rectF,
+                0f,
+                nextAngle,
+                true,
+                loadingPaint
+            )
+
+        }
 
     }
 
@@ -41,6 +207,24 @@ class LoadingButton @JvmOverloads constructor(
         widthSize = w
         heightSize = h
         setMeasuredDimension(w, h)
+    }
+
+    private fun startAnimation() {
+        rectF = RectF(
+            (widthSize * 2 / 3).toFloat(),
+            (heightSize / 4).toFloat(),
+            (widthSize * 4 / 6).toFloat() + 40f,
+            (heightSize / 4).toFloat() + 40f
+        )
+        valueAnimator.setIntValues(0, 1000)
+        valueAnimator.duration = 2000
+        valueAnimator.addUpdateListener { animator ->
+            val animatedValue = animator.animatedValue as Int
+            //if (animatedValue >= 1)
+            // showText = true
+            invalidate()
+        }
+        valueAnimator.start()
     }
 
 }
