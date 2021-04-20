@@ -28,15 +28,11 @@ class LoadingButton @JvmOverloads constructor(
 
     private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
         if (old != new) {
-            valueAnimator.start()
+           invalidate()
         }
     }
     private val intialText = context.getString(R.string.button_initial_text)
-    private val infoButtonText = context.getString(R.string.button_info_text)
     private val loadingText = context.getString(R.string.button_loading_text)
-    private lateinit var extraCanvas: Canvas
-    private lateinit var extraBitmap: Bitmap
-
 
     val textPaint = Paint().apply {
         style = Paint.Style.FILL
@@ -52,15 +48,6 @@ class LoadingButton @JvmOverloads constructor(
         alpha = 0
         color = getColor(context, R.color.white_transparent)
         typeface = Typeface.create("", Typeface.BOLD)
-    }
-
-    val infoPaintText = Paint().apply {
-        style = Paint.Style.FILL
-        textAlign = Paint.Align.CENTER
-        textSize = 25.0f
-        alpha = 0
-        color = getColor(context, R.color.colorPrimaryDark)
-        typeface = Typeface.create("", Typeface.NORMAL)
     }
 
     val overlayPaint = Paint().apply {
@@ -82,16 +69,6 @@ class LoadingButton @JvmOverloads constructor(
         typeface = Typeface.create("", Typeface.BOLD)
     }
 
-    val loadingPaintText = Paint().apply {
-        style = Paint.Style.FILL
-        textAlign = Paint.Align.CENTER
-        textSize = 25.0f
-        alpha = 0
-        color = getColor(context, R.color.white)
-        typeface = Typeface.create("", Typeface.NORMAL)
-    }
-
-    var startAngle = 0f
     var nextAngle = 0f
     private var rectF = RectF(
         (widthSize * 3 / 4).toFloat(),
@@ -109,7 +86,7 @@ class LoadingButton @JvmOverloads constructor(
 
 
     override fun performClick(): Boolean {
-        if (super.performClick()) return true
+        super.performClick()
         contentDescription = resources.getString(R.string.button_name)
         state = false
         loading = true
@@ -121,46 +98,13 @@ class LoadingButton @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        if (!state) {
+        if (!loading) {
             canvas.drawText(
                 intialText,
                 (widthSize / 2).toFloat(),
                 (heightSize / 2).toFloat(),
                 textPaint
             )
-        }
-
-        if (state) {
-
-            initialLeftPositionX
-            initialLeftPositionY = heightSize.toFloat()
-            rightPositionX += 10
-            rightPositionY += 10 - heightSize
-            canvas.drawRect(
-                initialLeftPositionX,
-                initialLeftPositionY,
-                rightPositionX,
-                rightPositionY,
-                overlayPaint
-            )
-            if (showText) {
-                canvas.drawRoundRect(
-                    (widthSize / 6).toFloat(),
-                    (heightSize / 8).toFloat(),
-                    (widthSize * 5 / 6).toFloat(),
-                    (heightSize * 7 / 8).toFloat(),
-                    40f,
-                    40f,
-                    infoPaint
-                )
-                canvas.drawText(
-                    infoButtonText,
-                    (widthSize / 2).toFloat(),
-                    (heightSize / 2).toFloat(),
-                    infoPaintText
-                )
-
-            }
         }
 
         if (loading) {
