@@ -3,17 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <Transition
+        app:autoTransition="animateToEnd"
         app:constraintSetEnd="@+id/end"
-        app:duration="1000"
-        app:autoTransition="animateToStart"
-        app:constraintSetStart="@+id/start">
-    </Transition>
+        app:constraintSetStart="@+id/start"
+        app:duration="1000" />
 
     <ConstraintSet android:id="@+id/start">
         <Constraint
             android:id="@+id/fileNameLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="0.0"
             app:layout_constraintEnd_toStartOf="@+id/fileName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -21,6 +21,7 @@
             android:id="@+id/fileName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="0.0"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/fileNameLabel"
@@ -29,6 +30,7 @@
             android:id="@+id/fileStatusLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="0.0"
             app:layout_constraintEnd_toStartOf="@+id/fileStatus"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/fileName" />
@@ -36,18 +38,18 @@
             android:id="@+id/fileStatus"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="0.0"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/fileStatusLabel"
             app:layout_constraintTop_toBottomOf="@+id/fileName" />
-
         <Constraint
             android:id="@+id/okButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="0.0"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
-
     </ConstraintSet>
 
 
@@ -57,6 +59,7 @@
             android:id="@+id/fileNameLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="1.0"
             app:layout_constraintEnd_toStartOf="@+id/fileName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -64,6 +67,7 @@
             android:id="@+id/fileName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="1.0"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/fileNameLabel"
@@ -72,6 +76,7 @@
             android:id="@+id/fileStatusLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="1.0"
             app:layout_constraintEnd_toStartOf="@+id/fileStatus"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/fileName" />
@@ -79,14 +84,15 @@
             android:id="@+id/fileStatus"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="1.0"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/fileStatusLabel"
             app:layout_constraintTop_toBottomOf="@+id/fileName" />
-
         <Constraint
             android:id="@+id/okButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="1.0"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
