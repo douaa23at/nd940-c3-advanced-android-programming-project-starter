@@ -25,68 +25,116 @@ class MainActivity : AppCompatActivity() {
     private lateinit var notificationManager: NotificationManager
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
+    private lateinit var downloadManager: DownloadManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+        notificationManager = ContextCompat.getSystemService(
+            applicationContext,
+            NotificationManager::class.java
+        ) as NotificationManager
+        downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
 
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
         custom_button.setOnClickListener {
             download()
         }
+        raddioGroup.setOnCheckedChangeListener { group, checkedId ->  custom_button.initialize() }
 
     }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            notificationManager.cancelNotifications()
             val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-            val notificationManager = ContextCompat.getSystemService(
-                applicationContext,
-                NotificationManager::class.java) as NotificationManager
-            notificationManager.createNotificationChannel(createChannel(
+            var downloadStatus = ""
+            var fileName = ""
+            id?.let {
+                val cursor = downloadManager.query(DownloadManager.Query().setFilterById(id))
+                if (cursor != null && cursor.moveToNext()) {
+                    val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+                    fileName =
+                        cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_TITLE))
+                    downloadStatus = when (status) {
+                        DownloadManager.STATUS_SUCCESSFUL -> "SUCCESS"
+                        else -> "FAILURE"
+                    }
+                    cursor.close()
+                }
+            }
+            setUpNotification(
                 CHANNEL_ID,
                 getString(R.string.notification_channel_name)
-            ))
-            notificationManager.sendNotification(getString(R.string.notification_description),applicationContext)
+            )
+            val mutableSet = mutableSetOf(
+                Data(
+                    DOWNLOAD_STATUS,
+                    downloadStatus
+                ),
+                Data(
+                    DOWNLOAD_URI,
+                    fileName
+                )
+            )
+            notificationManager.sendNotification(
+                mutableSet,
+                applicationContext
+            )
+            custom_button.initialize()
+            raddioGroup.clearCheck()
         }
     }
 
     private fun download() {
         var url = ""
+        var title = ""
 
         if (raddioGroup.checkedRadioButtonId == -1) {
             Toast.makeText(this, getString(R.string.button_info_text), Toast.LENGTH_SHORT).show()
+            custom_button.initialize()
         } else {
             when (raddioGroup.checkedRadioButtonId) {
-                R.id.optionOne -> url = URL_OPTION_ONE
-                R.id.optionTwo -> url = URL_OPTION_TWO
-                R.id.optionThree -> url = URL_OPTION_THREE
+                R.id.optionOne -> {
+                    url = URL_OPTION_ONE
+                    title = getString(R.string.option_one)
+                }
+                R.id.optionTwo -> {
+                    url = URL_OPTION_TWO
+                    title = getString(R.string.option_two)
+                }
+                R.id.optionThree -> {
+                    title = getString(R.string.option_three)
+                    url = URL_OPTION_THREE
+                }
             }
             val request =
                 DownloadManager.Request(Uri.parse(url))
                     .setTitle(getString(R.string.app_name))
                     .setDescription(getString(R.string.app_description))
+                    .setTitle(title)
                     .setRequiresCharging(false)
                     .setAllowedOverMetered(true)
                     .setAllowedOverRoaming(true)
 
-            val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
             downloadID =
                 downloadManager.enqueue(request)// enqueue puts the download request in the queue.
-
 
         }
 
     }
 
-    fun createChannel(channelId: String, channelName: String) : NotificationChannel {
-      return NotificationChannel(
-            channelId,
-            channelName,
-            NotificationManager.IMPORTANCE_HIGH
-        )
+    fun setUpNotification(channelId: String, channelName: String) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val notification = NotificationChannel(
+                channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationManager.createNotificationChannel(notification)
+        }
     }
 
     companion object {
@@ -94,7 +142,7 @@ class MainActivity : AppCompatActivity() {
             "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip"
         private const val URL_OPTION_ONE = "https://github.com/bumptech/glide"
         private const val URL_OPTION_THREE = "https://github.com/square/retrofit"
-         const val CHANNEL_ID = "channelId"
+        const val CHANNEL_ID = "channelId"
     }
 
 }

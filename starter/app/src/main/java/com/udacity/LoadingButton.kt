@@ -16,41 +16,56 @@ class LoadingButton @JvmOverloads constructor(
     private var heightSize = 0
     private var initialLeftPositionX = 0f
     private var initialLeftPositionY = 0f
-    private var leftPositionX = 0f
-    private var leftPositionY = 0f
     private var rightPositionX = 0f
     private var rightPositionY = 0f
-    private var state = false
-    private var showText = false
     private var loading = false
+    var nextAngle = 0f
+    private var rectF = RectF(
+        (widthSize * 3 / 4).toFloat(),
+        (heightSize / 8).toFloat(),
+        (widthSize * 3 / 4).toFloat() + 20f,
+        (heightSize / 8).toFloat() + 20f
+    )
 
     private val valueAnimator = ValueAnimator()
 
     private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
         if (old != new) {
-           invalidate()
+            invalidate()
         }
     }
-    private val intialText = context.getString(R.string.button_initial_text)
+
+    fun initialize() {
+        initialLeftPositionX = 0f
+        initialLeftPositionY = 0f
+        rightPositionX = 0f
+        rightPositionY = 0f
+        loading = false
+        isClickable = true
+        setBackgroundColor(getColor(context, R.color.colorPrimary))
+        invalidate()
+    }
+
+    private val initialText = context.getString(R.string.button_initial_text)
     private val loadingText = context.getString(R.string.button_loading_text)
 
-    val textPaint = Paint().apply {
+    private val textPaint = Paint().apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
         textSize = 30.0f
-        color = getColor(context, R.color.design_default_color_primary)
+        color = getColor(context, R.color.white)
         typeface = Typeface.create("", Typeface.BOLD)
     }
-    val infoPaint = Paint().apply {
+    private val infoPaint = Paint().apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
         textSize = 30.0f
         alpha = 0
-        color = getColor(context, R.color.white_transparent)
+        color = getColor(context, R.color.white)
         typeface = Typeface.create("", Typeface.BOLD)
     }
 
-    val overlayPaint = Paint().apply {
+    private val overlayPaint = Paint().apply {
         style = Paint.Style.FILL
         isDither = true
         isAntiAlias = true
@@ -60,7 +75,7 @@ class LoadingButton @JvmOverloads constructor(
         typeface = Typeface.create("", Typeface.BOLD)
     }
 
-    val loadingPaint = Paint().apply {
+    private val loadingPaint = Paint().apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
         textSize = 30.0f
@@ -69,26 +84,15 @@ class LoadingButton @JvmOverloads constructor(
         typeface = Typeface.create("", Typeface.BOLD)
     }
 
-    var nextAngle = 0f
-    private var rectF = RectF(
-        (widthSize * 3 / 4).toFloat(),
-        (heightSize / 8).toFloat(),
-        (widthSize * 3 / 4).toFloat() + 20f,
-        (heightSize / 8).toFloat() + 20f
-    )
-
-
     init {
         isClickable = true
+        loading = false
         setBackgroundColor(getColor(context, R.color.colorPrimary))
-
     }
-
 
     override fun performClick(): Boolean {
         super.performClick()
         contentDescription = resources.getString(R.string.button_name)
-        state = false
         loading = true
         startAnimation()
         invalidate()
@@ -100,7 +104,7 @@ class LoadingButton @JvmOverloads constructor(
 
         if (!loading) {
             canvas.drawText(
-                intialText,
+                initialText,
                 (widthSize / 2).toFloat(),
                 (heightSize / 2).toFloat(),
                 textPaint
@@ -127,7 +131,6 @@ class LoadingButton @JvmOverloads constructor(
                 infoPaint
             )
             nextAngle += 10f
-
             canvas.drawArc(
                 rectF,
                 0f,
@@ -135,9 +138,7 @@ class LoadingButton @JvmOverloads constructor(
                 true,
                 loadingPaint
             )
-
         }
-
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -161,11 +162,8 @@ class LoadingButton @JvmOverloads constructor(
             (heightSize / 4).toFloat() + 40f
         )
         valueAnimator.setIntValues(0, 1000)
-        valueAnimator.duration = 2000
-        valueAnimator.addUpdateListener { animator ->
-            val animatedValue = animator.animatedValue as Int
-            //if (animatedValue >= 1)
-            // showText = true
+        valueAnimator.duration = 1200
+        valueAnimator.addUpdateListener {
             invalidate()
         }
         valueAnimator.start()
