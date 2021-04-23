@@ -42,8 +42,17 @@ class MainActivity : AppCompatActivity() {
         custom_button.setOnClickListener {
             download()
         }
-        raddioGroup.setOnCheckedChangeListener { group, checkedId ->  custom_button.initialize() }
+        raddioGroup.setOnCheckedChangeListener { group, checkedId -> custom_button.initialize() }
 
+    }
+
+    override fun onPause() {
+        super.onPause()
+        try {
+            unregisterReceiver(receiver)
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        }
     }
 
     private val receiver = object : BroadcastReceiver() {

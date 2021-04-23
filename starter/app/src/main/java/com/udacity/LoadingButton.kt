@@ -6,6 +6,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat.getColor
+import androidx.core.content.withStyledAttributes
 import kotlin.properties.Delegates
 
 
@@ -42,6 +43,7 @@ class LoadingButton @JvmOverloads constructor(
         rightPositionY = 0f
         loading = false
         isClickable = true
+        nextAngle = 0f
         setBackgroundColor(getColor(context, R.color.colorPrimary))
         invalidate()
     }
@@ -85,9 +87,13 @@ class LoadingButton @JvmOverloads constructor(
     }
 
     init {
+        context.withStyledAttributes(attrs,R.styleable.LoadingButton){
+            setBackgroundColor(getColor(R.styleable.LoadingButton_loading_button_background,0))
+            textPaint.color = getColor(R.styleable.LoadingButton_loading_button_text_color,0)
+        }
         isClickable = true
         loading = false
-        setBackgroundColor(getColor(context, R.color.colorPrimary))
+
     }
 
     override fun performClick(): Boolean {

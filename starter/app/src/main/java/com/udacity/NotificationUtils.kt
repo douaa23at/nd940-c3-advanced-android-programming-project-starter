@@ -39,7 +39,7 @@ fun NotificationManager.sendNotification(
         applicationContext,
         CHANNEL_ID
     )
-        .setContentIntent(contentPendingIntent)
+        .setContentIntent(detailPendingIntent)
         .setSmallIcon(R.drawable.ic_baseline_notifications_none_24)
         .setContentTitle(applicationContext.getString(R.string.notification_title))
         .setContentText(applicationContext.getString(R.string.notification_description))

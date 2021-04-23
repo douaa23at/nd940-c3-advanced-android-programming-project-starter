@@ -60,6 +60,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/raddioGroup" />
+        app:layout_constraintTop_toBottomOf="@+id/raddioGroup"
+        app:loading_button_background="@color/colorPrimary"
+        app:loading_button_text_color="@color/white" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

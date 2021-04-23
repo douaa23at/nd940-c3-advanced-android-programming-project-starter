@@ -4,6 +4,8 @@
 
     <Transition
         app:constraintSetEnd="@+id/end"
+        app:duration="1000"
+        app:autoTransition="animateToStart"
         app:constraintSetStart="@+id/start">
     </Transition>
 
